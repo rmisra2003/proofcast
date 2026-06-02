@@ -422,13 +422,7 @@ If Tatum, Walrus, DeepSeek, PostgreSQL, or Redis are missing, the UI shows expli
 
 This is deliberate: the judging story only works if the proof is real.
 
-## Why ProofCast Can Win
 
-ProofCast is built directly around the hackathon prizes:
-
-- Best Walrus Integration: Walrus is the permanent memory layer for snapshots, AI reports, treasury reports, replay frames, audit artifacts, and Chain Memories.
-- Best Use of Tatum Tools: Tatum powers all Sui reads, transaction lookups, object fetches, event fetches, checkpoint verification, RPC proxying, and the official MCP story.
-- Main Prize: the product is understandable to non-technical judges, visually polished, live-deployed, and built around a real user need: making blockchain history permanent, readable, and verifiable.
 
 ## License
 
