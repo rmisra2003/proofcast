@@ -1,0 +1,8 @@
+{
+  "network": "testnet",
+  "packageId": "0xfaf8016d45c66af0be0ada0cbc35bf1170d8322901f0610994b2a80af1a5dd95",
+  "publishDigest": "AHKYnwQizZLVNjgbvAeMncVeo56FwZcpFzHDRRQDRdW5",
+  "publisherAddress": "0x84978ca85b3effd9712157238aa262126392b782897917d7e8475376dcfcb7a2",
+  "suiCliVersion": "sui 1.73.0-0a9aa917aabe",
+  "publishedAt": "2026-06-01T04:36:55Z"
+}

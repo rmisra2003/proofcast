@@ -1,0 +1,10 @@
+[package]
+name = "memoravault"
+edition = "2024"         # edition = "legacy" to use legacy (pre-2024) Move
+license = "MIT"
+authors = ["MemoraVault"]
+
+[dependencies]
+
+# Read more about the package management system options:
+# https://docs.sui.io/guides/developer/packages/move-package-management

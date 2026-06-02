@@ -1,0 +1,25 @@
+{
+  "name": "proofcast",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@11.2.2",
+  "scripts": {
+    "dev": "corepack pnpm --filter @proofcast/web dev",
+    "build": "corepack pnpm --filter @proofcast/web build",
+    "lint": "corepack pnpm --filter @proofcast/web lint",
+    "typecheck": "corepack pnpm --filter @proofcast/web typecheck",
+    "test": "corepack pnpm --filter @proofcast/web test",
+    "env:check": "corepack pnpm --filter @proofcast/web env:check",
+    "deploy:check": "corepack pnpm env:check && corepack pnpm lint && corepack pnpm typecheck && corepack pnpm test && corepack pnpm prisma:validate && corepack pnpm build && corepack pnpm move:build",
+    "prisma:generate": "corepack pnpm --filter @proofcast/web prisma:generate",
+    "prisma:validate": "corepack pnpm --filter @proofcast/web prisma:validate",
+    "prisma:deploy": "corepack pnpm --filter @proofcast/web prisma:deploy",
+    "env:bootstrap": "node scripts/bootstrap-local-env.mjs",
+    "infra:up": "docker compose up -d postgres redis",
+    "move:build": "sui move build --path contracts/sui/proofcast_registry",
+    "move:test": "sui move test --path contracts/sui/proofcast_registry"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
+}

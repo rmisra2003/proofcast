@@ -1,0 +1,29 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: proofcast-postgres
+    environment:
+      POSTGRES_DB: proofcast
+      POSTGRES_USER: proofcast
+      POSTGRES_PASSWORD: proofcast
+    ports:
+      - "5432:5432"
+    volumes:
+      - proofcast-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U proofcast -d proofcast"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: proofcast-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - proofcast-redis:/data
+
+volumes:
+  proofcast-postgres:
+  proofcast-redis:

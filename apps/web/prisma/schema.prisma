@@ -1,0 +1,233 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum WalletKind {
+  USER
+  DAO
+  TREASURY
+  NFT_COLLECTION
+  CONTRACT
+}
+
+enum SnapshotStatus {
+  CAPTURING
+  STORED
+  ANCHORED
+  VERIFIED
+  FAILED
+}
+
+enum VerificationStatus {
+  PENDING
+  VALID
+  INVALID
+  DEGRADED
+}
+
+enum AIReportKind {
+  SNAPSHOT
+  TREASURY
+  CHAIN_MEMORY
+}
+
+enum ActivityKind {
+  SNAPSHOT_CREATED
+  SNAPSHOT_VERIFIED
+  SNAPSHOT_ANCHORED
+  WALRUS_STORED
+  TATUM_SYNCED
+  AI_REPORT_CREATED
+  SHARE_CREATED
+}
+
+model User {
+  id            String       @id @default(cuid())
+  walletAddress String       @unique
+  displayName   String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  wallets       Wallet[]
+  snapshots     Snapshot[]
+  auditTrails   AuditTrail[]
+}
+
+model Wallet {
+  id            String         @id @default(cuid())
+  address       String         @unique
+  kind          WalletKind     @default(USER)
+  label         String?
+  ownerUserId   String?
+  ownerUser     User?          @relation(fields: [ownerUserId], references: [id], onDelete: SetNull)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  snapshots     Snapshot[]
+  transactions  Transaction[]
+  nfts          NFT[]
+  activityFeed  ActivityFeed[]
+  auditTrails   AuditTrail[]
+
+  @@index([kind])
+}
+
+model Snapshot {
+  id                 String               @id @default(cuid())
+  walletId           String
+  wallet             Wallet               @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  createdByUserId     String?
+  createdByUser       User?                @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
+  watchedAddress      String
+  checkpoint          String?
+  checkpointTimestamp DateTime?
+  status              SnapshotStatus       @default(CAPTURING)
+  publicSlug          String               @unique
+  canonicalHash       String
+  previousHash        String?
+  walrusBlobId        String?
+  walrusObjectId      String?
+  walrusProofUrl      String?
+  anchorObjectId      String?
+  anchorTxDigest      String?
+  riskScore           Int?
+  aiSummary           String?
+  riskAnalysis        String?
+  changeSummary       String?
+  humanReport         String?
+  raw                 Json
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  transactions        Transaction[]
+  nfts                NFT[]
+  aiReports           AIReport[]
+  verificationRecords VerificationRecord[]
+  walrusBlobs         WalrusBlob[]
+  activityFeed        ActivityFeed[]
+
+  @@index([watchedAddress])
+  @@index([createdAt])
+  @@index([canonicalHash])
+}
+
+model Transaction {
+  id              String    @id @default(cuid())
+  walletId        String
+  wallet          Wallet    @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  snapshotId      String?
+  snapshot        Snapshot? @relation(fields: [snapshotId], references: [id], onDelete: SetNull)
+  digest          String
+  timestamp       DateTime?
+  sender          String?
+  recipients      String[]
+  type            String?
+  amountMist      String?
+  gasUsedMist     String?
+  raw             Json
+  createdAt       DateTime  @default(now())
+
+  @@unique([walletId, digest])
+  @@index([digest])
+  @@index([timestamp])
+}
+
+model NFT {
+  id         String    @id @default(cuid())
+  walletId   String
+  wallet     Wallet    @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  snapshotId String?
+  snapshot   Snapshot? @relation(fields: [snapshotId], references: [id], onDelete: SetNull)
+  objectId   String
+  type       String?
+  name       String?
+  imageUrl   String?
+  raw        Json
+  createdAt  DateTime  @default(now())
+
+  @@unique([walletId, objectId])
+  @@index([type])
+}
+
+model AIReport {
+  id            String       @id @default(cuid())
+  snapshotId    String?
+  snapshot      Snapshot?    @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  kind          AIReportKind
+  model         String
+  promptVersion String
+  summary       String
+  riskScore     Int?
+  report        String
+  walrusBlobId  String?
+  outputHash    String
+  raw           Json
+  createdAt     DateTime     @default(now())
+}
+
+model VerificationRecord {
+  id             String             @id @default(cuid())
+  snapshotId     String
+  snapshot       Snapshot           @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  status         VerificationStatus
+  walrusOk       Boolean            @default(false)
+  tatumOk        Boolean            @default(false)
+  anchorOk       Boolean            @default(false)
+  hashOk         Boolean            @default(false)
+  details        Json
+  checkedAt      DateTime           @default(now())
+}
+
+model WalrusBlob {
+  id             String    @id @default(cuid())
+  snapshotId     String?
+  snapshot       Snapshot? @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  blobId         String
+  objectId       String?
+  purpose        String
+  proofUrl       String?
+  contentHash    String
+  byteSize       Int?
+  certifiedEpoch Int?
+  endEpoch       Int?
+  raw            Json?
+  createdAt      DateTime  @default(now())
+
+  @@index([blobId])
+  @@index([purpose])
+}
+
+model ActivityFeed {
+  id         String       @id @default(cuid())
+  walletId   String?
+  wallet     Wallet?      @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  snapshotId String?
+  snapshot   Snapshot?    @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  kind       ActivityKind
+  title      String
+  body       String
+  metadata   Json?
+  createdAt  DateTime     @default(now())
+
+  @@index([createdAt])
+}
+
+model AuditTrail {
+  id          String    @id @default(cuid())
+  userId      String?
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  walletId    String?
+  wallet      Wallet?   @relation(fields: [walletId], references: [id], onDelete: SetNull)
+  action      String
+  targetId    String?
+  requestId   String?
+  ipHash      String?
+  metadata    Json?
+  createdAt   DateTime  @default(now())
+
+  @@index([action])
+  @@index([createdAt])
+}

@@ -1,0 +1,10 @@
+[package]
+name = "proofcast_registry"
+edition = "2024"
+license = "MIT"
+authors = ["ProofCast"]
+
+[dependencies]
+
+[addresses]
+proofcast_registry = "0x0"

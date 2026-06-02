@@ -1,0 +1,16 @@
+.DS_Store
+node_modules
+.next
+.turbo
+dist
+coverage
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+apps/web/.env.local
+apps/web/prisma/dev.db
+contracts/**/build
+contracts/**/traces
+contracts/**/*.trace
+contracts/**/*.coverage*
